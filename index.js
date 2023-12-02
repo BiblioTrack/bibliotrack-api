@@ -1,25 +1,26 @@
+// Import necessary modules
 const express = require('express');
+const dotenv = require('dotenv');
 
+// Load environment variables from .env file
+dotenv.config();
+
+// Create an instance of Express app
 const app = express();
 
-const port = process.env.PORT || 5000;
+// Define middleware
+app.use(express.json()); // Middleware to parse JSON bodies
 
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-  next();
+// Define your routes (sample route)
+app.get('/', (req, res) => {
+  res.send('Hello, this is your backend API!');
 });
 
-app.use((req, res, next) => {
-  res.send('Welcome to Express');
-});
+// Define the port where the server will run
+const PORT = process.env.PORT || 8080; // Use the defined port or default to 3000
 
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+// Start the server
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+  console.log(`Follow this link http://127.0.0.1:${PORT}/`)
 });
-
-app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-    next();
-  });
