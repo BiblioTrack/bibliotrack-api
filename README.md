@@ -1,9 +1,8 @@
 # bibliotrack-api
-REST API for bibliotrack
 
 # Node.js Application
 
-This is a simple Node.js application that demonstrates [briefly describe what your application does or its purpose].
+This is a simple Node.js application that demonstrates REST API for BiblioTrack app.
 
 ## Installation
 
