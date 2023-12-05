@@ -62,7 +62,7 @@ const bookSchema = new Schema({
         type: Number, min:1 
     },
     language: {
-        type: String, enum: ['Turkish', 'English', 'German', 'Italian', 'French', 'Arabic', 'Persian', 'Greek', 'Spanish','Polish', 'Other', 'Unknown'],
+        type: String, enum: ['English', 'German','Turkish',  'Italian', 'French', 'Arabic', 'Persian', 'Greek', 'Spanish','Polish', 'Other', 'Unknown'],
         required: true
     }
 }, {
