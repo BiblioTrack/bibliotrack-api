@@ -1,26 +1,54 @@
-// Import necessary modules
-const express = require('express');
-const dotenv = require('dotenv');
+const express=require('express');
+const mongoose=require('mongoose');
+const bodyParser=require('body-parser');
+const path=require('path');
+var passport = require('passport');
+var authenticate = require('./authenticate');
 
-// Load environment variables from .env file
-dotenv.config();
 
-// Create an instance of Express app
-const app = express();
+// Loading routers
+const bookRouter = require('./routes/api/bookRouter');
+const userRouter = require('./routes/api/userRouter');
+const issueRouter = require('./routes/api/issueRouter');
+const app= express();
 
-// Define middleware
-app.use(express.json()); // Middleware to parse JSON bodies
+app.use(function(req, res, next) {
 
-// Define your routes (sample route)
-app.get('/', (req, res) => {
-  res.send('Hello, this is your backend API!');
+  res.header("Access-Control-Allow-Origin", "*");
+
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+  next();
+
 });
 
-// Define the port where the server will run
-const PORT = process.env.PORT || 8080; // Use the defined port or default to 3000
+// Bodyparser Middleware
+app.use(bodyParser.json());
 
-// Start the server
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-  console.log(`Follow this link http://127.0.0.1:${PORT}/`)
-});
+// DB config 
+const mongoURI = require('./config/keys').mongoURI;
+
+// Connect to mongo
+mongoose.connect(mongoURI)
+.then(()=> {console.log("MongoDB Connected");})
+.catch(err => console.log(err));
+
+app.use(passport.initialize());
+
+// Use routes
+app.use('/api/books',bookRouter);
+app.use('/api/users',userRouter);
+app.use('/api/issues',issueRouter);
+
+// Serve static assets if in production
+if (process.env.NODE_ENV === 'production') {
+    // Set static folder
+    app.use(express.static('client/build'));
+  
+    app.get('*', (req, res) => {
+      res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
+    });
+  }
+
+  const port = process.env.PORT || 8080;
+  app.listen(port, ()=> console.log(`Server started running on port ${port}`));
