@@ -28,4 +28,9 @@ jobs:
         cache: 'npm'
     - run: npm ci
     - run: npm run build --if-present
-    - run: npm test
+    - name: Run tests
+      run: npm test
+      env:
+        CI: true
+        # Adjust the timeout value here (e.g., 5000ms or 5 seconds)
+        MOCHA_TIMEOUT: 5000
