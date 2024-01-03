@@ -1,3 +1,18 @@
+/**
+ * bookRouter.js
+ * Routes for managing books in the library system.
+ */
+
+// GET /books: Fetches all books (accessible by admin).
+// POST /books: Creates a new book (accessible by authenticated users).
+// PUT /books: Updates all books (not supported, returns 403 Forbidden).
+// DELETE /books: Deletes all books (not supported, returns 403 Forbidden).
+
+// GET /books/:bookId: Fetches a specific book by ID (accessible by all users).
+// POST /books/:bookId: Creates a new book with a specific ID (not supported, returns 403 Forbidden).
+// PUT /books/:bookId: Updates a specific book by ID (accessible by authenticated users).
+// DELETE /books/:bookId: Deletes a specific book by ID (accessible by admin).
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose=require('mongoose');
@@ -6,7 +21,7 @@ const authenticate=require('../../authenticate');
 const cors = require('../cors');
 const Books=require('../../models/books');
 bookRouter.use(bodyParser.json());
-// Test CI Commit
+
 bookRouter.route('/')
 .options(cors.corsWithOptions, (req, res) => { res.sendStatus(200); })
 

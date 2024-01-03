@@ -1,3 +1,17 @@
+/**
+ * userRouter.js
+ * Routes for user authentication and management.
+ */
+
+// GET /: Fetches all users (accessible by admin).
+// PUT /:userId: Updates user details by ID (accessible by authenticated users).
+// PUT /password/:userId: Updates user password by ID (accessible by authenticated users, except admin).
+// POST /signup: Creates a new user account.
+// POST /login: Logs in a user and generates a JWT token for authentication.
+// GET /logout: Logs out a user session.
+// GET /checkJWTtoken: Checks the validity of the JWT token for user authentication.
+
+
 var express = require('express');
 var router = express.Router();
 const bodyParser = require('body-parser');

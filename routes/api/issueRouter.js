@@ -1,7 +1,19 @@
+
+/**
+ * issueRouter.js
+ * Routes for handling issues related to books and users.
+ */
+
+// GET /issues: Fetches all issues (accessible by admin).
+// POST /issues: Creates a new issue (accessible by authenticated users).
+// GET /issues/:issueId: Fetches a specific issue by ID (accessible by authenticated users).
+// DELETE /issues/:issueId: Deletes a specific issue by ID (accessible by admin).
+
 var express = require('express');
 const bodyParser = require('body-parser');
 const issueRouter = express.Router();
 const mongoose=require('mongoose');
+
 
 var Issue = require('../../models/issues');
 var Books = require('../../models/books');

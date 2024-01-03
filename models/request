@@ -1,8 +1,8 @@
+// Issue request
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-
-const issueSchema = new Schema({
+const requestSchema = new Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
@@ -13,10 +13,6 @@ const issueSchema = new Schema({
         ref: 'Book',
         required: true
     },
-    copyNumber: {
-        type: Number, // Assuming copy number is a numerical value
-        required: true
-    },
     issueDate: {
         type: Date,
         default: Date.now
@@ -24,17 +20,16 @@ const issueSchema = new Schema({
     dueDate: {
         type: Date,
         required: true
-    },
-    returnDate: {
-        type: Date
-    },
-    isReturned: {
-        type: Boolean,
-        default: false
+    },  
+    status: {
+        type: String,
+        enum: ['Pending', 'Rejected', 'Approved'],
+        default: 'Pending'
     }
+}, {
+    timestamps: true
 });
 
+const Request = mongoose.model('Request', requestSchema);
 
-var Issues = mongoose.model('Issue',issueSchema);
-
-module.exports=Issues;
+module.exports = Request;

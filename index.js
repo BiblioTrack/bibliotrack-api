@@ -10,6 +10,7 @@ var authenticate = require('./authenticate');
 const bookRouter = require('./routes/api/bookRouter');
 const userRouter = require('./routes/api/userRouter');
 const issueRouter = require('./routes/api/issueRouter');
+const requestRouter = require('./routes/api/requestRouter');
 const app= express();
 
 app.use(function(req, res, next) {
@@ -39,6 +40,7 @@ app.use(passport.initialize());
 app.use('/api/books',bookRouter);
 app.use('/api/users',userRouter);
 app.use('/api/issues',issueRouter);
+app.use('/api/request',requestRouter);
 
 // Serve static assets if in production
 if (process.env.NODE_ENV === 'production') {
