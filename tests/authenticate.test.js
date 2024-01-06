@@ -19,7 +19,7 @@ const {
 // Import the User model 
 const User = require('../models/users');
 
-// Import the configuration (replace the path accordingly)
+// Import the configuration 
 const config = require('../config/keys.js');
 
 describe('Authentication Unit Tests', () => {
