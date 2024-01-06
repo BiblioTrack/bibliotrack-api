@@ -10,19 +10,16 @@ const mongoose = require('mongoose');
 
 
 describe('Testing book routes', () => {
-    let app; // Move app variable outside beforeEach to make it accessible in the test cases
+    let app;
 
     beforeEach(() => {
-        // Create spies for verifyUser and verifyAdmin
         sandbox.stub(auth, 'verifyUser').callsFake((req, res, next) => next());
         sandbox.stub(auth, 'verifyAdmin').callsFake((req, res, next) => next());
 
-        // Import the app only once
         app = require('../index');
     });
 
     after(async () => {
-        // Close the Mongoose connection after all tests are done
         await mongoose.connection.close();
         app.close()
       });
@@ -39,7 +36,7 @@ describe('Testing book routes', () => {
                 .delete('/api/books')
                 .expect(403)
                 .end((err, response) => {
-                    // expect(response.body).to.have.property('message').to.equal('DELETE operation not supported on /books');
+                    expect(response.statusCode).to.equal(403);
                     done(err);
                 });
         });
