@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const chai = require('chai');
-const expect = chai.expect;
+const { expect } = chai;
 
 const Book = require('../models/books');
 
