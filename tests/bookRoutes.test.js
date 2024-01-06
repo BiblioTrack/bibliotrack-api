@@ -24,6 +24,7 @@ describe('Testing book routes', () => {
     after(async () => {
         // Close the Mongoose connection after all tests are done
         await mongoose.connection.close();
+        app.close()
       });
 
     afterEach(() => {
