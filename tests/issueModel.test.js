@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const chai = require('chai');
-const { expect } = chai;
+const expect = chai.expect;
 
 const Issue = require('../models/issues'); // Update the path to your issue model
 
