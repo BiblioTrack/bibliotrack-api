@@ -51,6 +51,4 @@ describe('Request Model', () => {
     expect(status.options.enum).to.deep.equal(['Pending', 'Rejected', 'Approved']);
     expect(status.options.default).to.equal('Pending');
   });
-
-  // Add more test cases based on your requirements
 });

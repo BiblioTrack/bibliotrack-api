@@ -7,7 +7,7 @@ const Issue = require('../models/issues'); // Update the path to your issue mode
 const mongoURI = require('../config/keys').mongoTestURI; // Replace with your test database URI
 
 describe('Issue Model', () => {
-  before(async () => {
+   before(async () => {
     await mongoose.connect(mongoURI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
