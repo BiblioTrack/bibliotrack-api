@@ -10,9 +10,10 @@ const mongoose = require('mongoose');
 const Book = require('../models/books');
 const { response } = require('express');
 
+const mongoURI = require('../config/keys').mongoTestURI;
 
 describe('Testing book routes', () => {
-    let app;
+    let app, mongoServer;
 
     beforeEach(() => {
         sandbox.stub(auth, 'verifyUser').callsFake((req, res, next) => next());
@@ -33,9 +34,21 @@ describe('Testing book routes', () => {
     describe('Testing / route', () => {
         // TODO
 
-        let sampleBook, newBook;
+        let sampleBook, newBook, books;
 
-        beforeEach(() => {
+        before(async () => {
+            await mongoose.connect(mongoURI, {
+              useNewUrlParser: true,
+              useUnifiedTopology: true
+            });
+          });
+
+        after(async () => {
+            await mongoose.disconnect();
+            await mongoose.connection.close();
+        });
+
+        beforeEach(async() => {
             sampleBook = {
                 name: 'Test Book',
                 author: 'Test Author',
@@ -51,9 +64,33 @@ describe('Testing book routes', () => {
               };
           
             newBook = new Book(sampleBook);
-
             sandbox.stub(Book, 'create').resolves(sampleBook);
-        })
+        });
+
+        afterEach(async () => {
+            await Book.deleteMany({});
+          });
+
+        it('should fetch all books', async () => {
+            const savedBook1 = await newBook.save();
+            let tmpBook = { ...sampleBook, name: 'Test Book 1', isbn: '1234567890124'};
+            let newBook1 = new Book(tmpBook);
+            const savedBook2 = await newBook1.save();
+
+            books = [
+                savedBook1.toObject(),
+                savedBook2.toObject(),
+            ];
+
+            const response = await request(app).get('/api/books');
+            const responseNames = response.body.map(book => book.name);
+            const responseIsbns = response.body.map(book => book.isbn);
+
+            expect(response.status).to.equal(200);
+            expect(responseNames).to.include.members(books.map(book => book.name));
+            expect(responseIsbns).to.include.members(books.map(book => book.isbn));
+
+    });
 
         it('POST / should create a new book', (done) => {
               request(app)
