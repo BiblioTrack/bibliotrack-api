@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const today = new Date();
-const current_year = today.getFullYear();
 
 
 const bookSchema = new Schema({
@@ -28,8 +27,8 @@ const bookSchema = new Schema({
         required: true,
         unique: true
     },
-    cat: {
-        type: String,
+    genres: {
+        type: [String],
         enum: ['Romance','Technology','Computer Science','Management','Electronics','Physics','Chemistry','Mathematics','Fiction','Philosophy','Language','Arts','Other'],
         required: true
     },
@@ -39,15 +38,18 @@ const bookSchema = new Schema({
         max: 100,
         required: true
     },
+    pages: {
+        type: Number ,min:1 // Assuming pages is a number
+    },
     floor: {
         type: Number, min: 0, max: 8
     }, 
+    format: {
+        type: String  // Assuming format is a string
+    },
     copies: {
         type: Number,
         min: 1, max: 1000, required: true
-    },
-    publishYear: {
-        type: Number, max: current_year
     },
     editor: {
         type: String, required: true
@@ -55,11 +57,19 @@ const bookSchema = new Schema({
     publisher:{
         type:String,
     },
+    publicationDate: {
+        type: Date,  // Changed to Date type
+        max: today,  // Set max date to the current date
+        default: today  // Set default value to today's date
+    },
+    availableCopies: {
+        type: Number, min: 0
+    },
+    totalCopies: {
+        type: Number, min: 0  // Assuming totalCopies is a number
+    },
     edition: {
         type: Number, min: 1, max: 1000
-    },
-    pageCount: {
-        type: Number, min:1 
     },
     language: {
         type: String, enum: ['English', 'German','Turkish',  'Italian', 'French', 'Arabic', 'Persian', 'Greek', 'Spanish','Polish', 'Other', 'Unknown'],
