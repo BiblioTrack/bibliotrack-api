@@ -13,63 +13,55 @@ const { response } = require('express');
 const mongoURI = require('../config/keys').mongoTestURI;
 
 describe('Testing book routes', () => {
-    let app, mongoServer;
+    let app;
+    let sampleBook, newBook, books;
+
+    before(async () => {
+        await mongoose.connect(mongoURI, {
+          useNewUrlParser: true,
+          useUnifiedTopology: true
+        });
+      });
 
     beforeEach(() => {
         sandbox.stub(auth, 'verifyUser').callsFake((req, res, next) => next());
         sandbox.stub(auth, 'verifyAdmin').callsFake((req, res, next) => next());
 
         app = require('../index');
+
+        sampleBook = {
+            name: 'Test Book',
+            author: 'Test Author',
+            description: 'Test description',
+            isbn: '1234567890123',
+            cat: 'Fiction',
+            shelf: 5,
+            copies: 1,
+            publishYear: 2023,
+            editor: 'Test Editor',
+            language: 'English'
+            // Add other fields as needed for the test
+          };
+          
+          newBook = new Book(sampleBook);
     });
 
     after(async () => {
+        // await mongoose.disconnect();
         await mongoose.connection.close();
         app.close()
       });
 
-    afterEach(() => {
+    afterEach(async() => {
+        await Book.deleteMany({});
+
         sandbox.restore();
     });
 
     describe('Testing / route', () => {
-        // TODO
-
-        let sampleBook, newBook, books;
-
-        before(async () => {
-            await mongoose.connect(mongoURI, {
-              useNewUrlParser: true,
-              useUnifiedTopology: true
-            });
-          });
-
-        after(async () => {
-            await mongoose.disconnect();
-            await mongoose.connection.close();
-        });
-
         beforeEach(async() => {
-            sampleBook = {
-                name: 'Test Book',
-                author: 'Test Author',
-                description: 'Test description',
-                isbn: '1234567890123',
-                cat: 'Fiction',
-                shelf: 5,
-                copies: 1,
-                publishYear: 2023,
-                editor: 'Test Editor',
-                language: 'English'
-                // Add other fields as needed for the test
-              };
-          
-            newBook = new Book(sampleBook);
             sandbox.stub(Book, 'create').resolves(sampleBook);
         });
-
-        afterEach(async () => {
-            await Book.deleteMany({});
-          });
 
         it('should fetch all books', async () => {
             const savedBook1 = await newBook.save();
@@ -89,7 +81,6 @@ describe('Testing book routes', () => {
             expect(response.status).to.equal(200);
             expect(responseNames).to.include.members(books.map(book => book.name));
             expect(responseIsbns).to.include.members(books.map(book => book.isbn));
-
     });
 
         it('POST / should create a new book', (done) => {
@@ -98,7 +89,7 @@ describe('Testing book routes', () => {
                 .expect(200)
                 .end((err, response) => {
                     expect(response.body.name).to.equal(newBook.name);
-                    expect(response.body.author).to.equal(newBook.author);
+                    expect(response.body.isbn).to.equal(newBook.isbn);
                     done(err);
                 });
         });
@@ -123,4 +114,45 @@ describe('Testing book routes', () => {
                 });
         });
     })
+
+    describe('Testing /:bookId route', () => {
+        it('GET /book:Id should fetch a specific book', async() => {
+            const savedBook = await newBook.save();
+
+            const response = await request(app)
+                .get(`/api/books/${savedBook._id}`)
+                .expect(200);
+
+            expect(response.statusCode).to.equal(200);
+            expect(response.body).to.be.an('object');
+            expect(response.body._id).to.equal(savedBook._id.toString());
+        });
+
+        it('POST /:bookId should fail', async() => {
+            const savedBook = await newBook.save();
+
+            const response = await request(app)
+                .post(`/api/books/${savedBook._id}`)
+                .expect(403);
+        });
+
+        it('PUT /:bookId should update a specific book', async() => {
+            const savedBook = await newBook.save();
+
+            const updatedData = {
+                name: 'Updated Book Name',
+                author: 'Updated Author',
+            };
+
+            const response = await request(app)
+                .put(`/api/books/${savedBook._id}`)
+                .send(updatedData)
+                .set('Accept', 'application/json')
+                .expect(200);
+
+            expect(response.body).to.have.property('_id').equal(savedBook._id.toString());
+            expect(response.body).to.have.property('name').equal(updatedData.name);
+            expect(response.body).to.have.property('author').equal(updatedData.author);
+        });
+    });
 })
