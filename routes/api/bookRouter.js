@@ -88,7 +88,7 @@ bookRouter.route('/:bookId')
 })
 
 .delete(cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyAdmin,(req, res, next) => {
-    Books.findByIdAndRemove(req.params.bookId)
+    Books.findByIdAndDelete(req.params.bookId)
     .then((resp) => {
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');

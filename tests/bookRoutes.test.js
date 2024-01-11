@@ -47,7 +47,6 @@ describe('Testing book routes', () => {
     });
 
     after(async () => {
-        // await mongoose.disconnect();
         await mongoose.connection.close();
         app.close()
       });
@@ -154,5 +153,16 @@ describe('Testing book routes', () => {
             expect(response.body).to.have.property('name').equal(updatedData.name);
             expect(response.body).to.have.property('author').equal(updatedData.author);
         });
+
+        it('should delete a specific book by ID', async () => {
+            const savedBook = await newBook.save();
+
+            const response = await request(app)
+              .delete(`/api/books/${savedBook._id}`)
+              .expect(200);
+        
+            expect(response.body).to.have.property('_id').equal(savedBook._id.toString());
+            expect(response.body).to.have.property('success').equal(true);
+          });
     });
 })
