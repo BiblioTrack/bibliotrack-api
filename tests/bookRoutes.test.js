@@ -115,9 +115,13 @@ describe('Testing book routes', () => {
     })
 
     describe('Testing /:bookId route', () => {
-        it('GET /book:Id should fetch a specific book', async() => {
-            const savedBook = await newBook.save();
+        let savedBook;
 
+        beforeEach(async() => {
+            savedBook = await newBook.save();
+        })
+
+        it('GET /book:Id should fetch a specific book', async() => {
             const response = await request(app)
                 .get(`/api/books/${savedBook._id}`)
                 .expect(200);
@@ -128,16 +132,12 @@ describe('Testing book routes', () => {
         });
 
         it('POST /:bookId should fail', async() => {
-            const savedBook = await newBook.save();
-
             const response = await request(app)
                 .post(`/api/books/${savedBook._id}`)
                 .expect(403);
         });
 
         it('PUT /:bookId should update a specific book', async() => {
-            const savedBook = await newBook.save();
-
             const updatedData = {
                 name: 'Updated Book Name',
                 author: 'Updated Author',
@@ -155,8 +155,6 @@ describe('Testing book routes', () => {
         });
 
         it('should delete a specific book by ID', async () => {
-            const savedBook = await newBook.save();
-
             const response = await request(app)
               .delete(`/api/books/${savedBook._id}`)
               .expect(200);
