@@ -98,9 +98,25 @@ describe('Testing issue routes', () => {
         });
 
         it('DELETE /issues should delete all issues', async() => {
-            const response = await request(app)
+            const userId = new mongoose.Types.ObjectId().toString();
+            const bookId = new mongoose.Types.ObjectId().toString();
+
+            const sampleIssue = {
+            userId,
+            bookId,
+            copyNumber: 1,
+            dueDate: new Date()
+            };
+
+            const newIssue = new Issue(sampleIssue);
+            await newIssue.save();
+
+            await request(app)
                 .delete('/api/issues')
                 .expect(200);
+
+            const issuesInDb = await mongoose.model('Issue').find();
+            expect(issuesInDb).to.have.lengthOf(0);
         })
 
     });
