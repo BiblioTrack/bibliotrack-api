@@ -8,7 +8,6 @@ const request = require('supertest');
 const sandbox = sinon.createSandbox();
 const mongoose = require('mongoose');
 const Book = require('../models/books');
-const { response } = require('express');
 
 const mongoURI = require('../config/keys').mongoTestURI;
 
@@ -40,7 +39,6 @@ describe('Testing book routes', () => {
             publishYear: 2023,
             editor: 'Test Editor',
             language: 'English'
-            // Add other fields as needed for the test
           };
           
           newBook = new Book(sampleBook);
@@ -154,7 +152,7 @@ describe('Testing book routes', () => {
             expect(response.body).to.have.property('author').equal(updatedData.author);
         });
 
-        it('should delete a specific book by ID', async () => {
+        it('DELETE /:bookId should delete a specific book by ID', async () => {
             const response = await request(app)
               .delete(`/api/books/${savedBook._id}`)
               .expect(200);

@@ -44,13 +44,11 @@ issueRouter.route('/')
 )
 
 .post(cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyAdmin,(req, res, next) => {
-    Books.findById(req.body.book)
+    Books.findById(req.body.bookId)
     .then((requiredBook)=>{
-        Users.findById(req.body.student)
+        Users.findById(req.body.userId)
         .then((requiredUser)=>{
-            
             if(!requiredBook){
-            
                 err = new Error("Book doesn't exist");
                 err.status = 400;
                 return next(err);
@@ -62,9 +60,9 @@ issueRouter.route('/')
                    }
             else if(requiredBook._id&&requiredUser._id) {
                 Issue.find({
-                   student: req.body.student 
+                   student: req.body.userId 
                 })
-                .then((issues)=>{
+                .then(async(issues)=>{
                     notReturned=issues.filter((issue)=>(!issue.returned));
                     if(notReturned&&notReturned.length>=3){
                         err = new Error(`The student has already issued 3 books. Please return them first`);
@@ -72,26 +70,20 @@ issueRouter.route('/')
                         return next(err);
                     }
                     else{
-                        if(requiredBook.copies>0){
-                        Issue.create(req.body, function(err, issue) {
-                            if (err) return next(err)
-                            Issue.findById(issue._id)
-                            .populate('student')
-                            .populate('book')                        
-                            .exec(function(err, issue) {
-                              if (err) return next(err)
-                              Books.findByIdAndUpdate(req.body.book,{
-                                $set: {copies: (requiredBook.copies-1)}
-                            },{new: true})
-                            .then((book) => {
-                            res.statusCode=200;
-                            res.setHeader('Content-Type','application/json');
-                            res.json(issue);
-            
-                           }, (err) => next(err))
-                           .catch((err) => res.status(400).json({success: false}));
-            
-                            })})
+                        if (requiredBook.copies > 0) {
+                            const issue = await Issue.create(req.body);
+        
+                            const populatedIssue = await Issue.findById(issue._id)
+                                .populate('userId')
+                                .populate('bookId');
+        
+                            await Books.findByIdAndUpdate(req.body.bookId, {
+                                $set: { copies: (requiredBook.copies - 1) }
+                            }, { new: true });
+        
+                            res.statusCode = 200;
+                            res.setHeader('Content-Type', 'application/json');
+                            res.json(populatedIssue);
                     }
                     else {
                         console.log(requiredBook);
@@ -103,9 +95,6 @@ issueRouter.route('/')
                 })
                 .catch((err)=>(next(err))) ;
             }
-            
-            
-
 
         },(err)=>(next(err)))
         .catch((err)=>(next(err))) 
@@ -119,20 +108,17 @@ issueRouter.route('/')
     res.statusCode = 403;
     res.end('PUT operation not supported on /issues');
 })
-.delete(cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyAdmin,(req, res, next) => {
-    //res.statusCode = 403;
-    //res.end('DELETE operation not supported on /issues');
-    
-    Issue.remove({})
-    .then((resp) => {
-        console.log("Removed All Issue");
-        res.statusCode = 200;
-        res.setHeader('Content-Type', 'application/json');
-        res.json(resp);
-    }, (err) => next(err))
-    .catch((err) => next(err));
-    
-})
+.delete(cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
+    Issue.deleteMany({})
+        .then((resp) => {
+            console.log("Removed All Issues");
+            res.statusCode = 200;
+            res.setHeader('Content-Type', 'application/json');
+            res.json(resp);
+        })
+        .catch((err) => next(err));
+});
+
 issueRouter.route('/student/')
 .options(cors.corsWithOptions, (req, res) => { res.sendStatus(200); })
 .get(cors.corsWithOptions,authenticate.verifyUser,(req,res,next) => {
