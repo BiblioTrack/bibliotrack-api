@@ -13,6 +13,8 @@ const User = require('../models/users');
 
 const mongoURI = require('../config/keys').mongoTestURI;
 
+const jwt = require('jsonwebtoken');
+
 describe('Testing issue routes', () => {
 
     before(async () => {
@@ -23,6 +25,8 @@ describe('Testing issue routes', () => {
     });
 
     beforeEach(() => {
+        sandbox.stub(auth, 'verifyUser').callsFake((req, res, next) => next());
+
         app = require('../index');
     });
 
@@ -35,11 +39,11 @@ describe('Testing issue routes', () => {
         await Issue.deleteMany({});
         await User.deleteMany({});
         await Book.deleteMany({});
+
+        sandbox.restore();
     });
 
     describe('/api/issues', () => {
-        let sampleBook, sampleUser;
-
         it('GET /issues should fetch all issues', async () => {
           const response = await request(app)
             .get('/api/issues')
@@ -49,7 +53,7 @@ describe('Testing issue routes', () => {
         });
 
         it('POST /issues should create a new issue', async () => {
-            sampleBook = {
+            const sampleBook = {
                 name: 'Test Book',
                 author: 'Test Author',
                 description: 'Test description',
@@ -65,7 +69,7 @@ describe('Testing issue routes', () => {
             const book = new Book(sampleBook);
             let savedBook = await book.save();
 
-            sampleUser = {
+            const sampleUser = {
                 firstname: 'John',
                 lastname: 'Doe',
                 email: 'johndoe@example.com',
@@ -118,6 +122,67 @@ describe('Testing issue routes', () => {
             const issuesInDb = await mongoose.model('Issue').find();
             expect(issuesInDb).to.have.lengthOf(0);
         })
+    });
 
+    describe('/api/issues/:issueId', () => {
+        // it('GET /:issueId should fetch a specific issue by ID', async () => {
+        //     const sampleBook = {
+        //         name: 'Test Book',
+        //         author: 'Test Author',
+        //         description: 'Test description',
+        //         isbn: '1234567890123',
+        //         cat: 'Fiction',
+        //         shelf: 5,
+        //         copies: 1,
+        //         publishYear: 2023,
+        //         editor: 'Test Editor',
+        //         language: 'English',
+        //       };
+
+        //     const book = new Book(sampleBook);
+        //     let savedBook = await book.save();
+
+        //     const sampleUser = {
+        //         firstname: 'John',
+        //         lastname: 'Doe',
+        //         email: 'johndoe@example.com',
+        //         roll: '12345',
+        //         admin: false,
+        //     };
+
+        //     const user = new User(sampleUser);
+        //     let savedUser = await user.save();
+
+        //     const sampleIssue = {
+        //         userId: savedUser._id,
+        //         bookId: savedBook._id,
+        //         copyNumber: 1,
+        //         dueDate: new Date()
+        //       };
+
+        //     const newIssue = new Issue(sampleIssue);
+        //     const savedIssue = await newIssue.save();
+
+        //     console.log(auth.getToken(sampleUser));
+
+        //     const response = await request(app)
+        //         .get(`/api/issues/${savedIssue._id}`)
+        //         .set('Authorization', `Bearer ${auth.getToken(sampleUser)}`)
+        //         .expect(200);
+
+        //     expect(response.body).to.have.property('_id').equal(savedIssue._id.toString());
+        // })
+
+        it('POST /:issueId should fail', async() => {
+            await request(app)
+                .post(`/api/issues/${1}`)
+                .expect(403);
+        })
+
+        it('DELETE /:issueId should fail', async() => {
+            await request(app)
+                .delete(`/api/issues/${1}`)
+                .expect(403);
+        })
     });
 });
