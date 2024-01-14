@@ -181,7 +181,6 @@ issueRouter
       .populate("bookId")
       .then(
         (issue) => {
-            console.log(req.user);
           if (issue && (issue.userId._id === req.user._id || req.user.admin)) {
             res.statusCode = 200;
             res.setHeader("Content-Type", "application/json");

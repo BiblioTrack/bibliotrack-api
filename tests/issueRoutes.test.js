@@ -13,10 +13,7 @@ const User = require('../models/users');
 
 const mongoURI = require('../config/keys').mongoTestURI;
 
-const jwt = require('jsonwebtoken');
-
 describe('Testing issue routes', () => {
-
     before(async () => {
         await mongoose.connect(mongoURI, {
             useNewUrlParser: true,
@@ -25,8 +22,6 @@ describe('Testing issue routes', () => {
     });
 
     beforeEach(() => {
-        sandbox.stub(auth, 'verifyUser').callsFake((req, res, next) => next());
-
         app = require('../index');
     });
 
