@@ -26,6 +26,7 @@ describe('User Model', () => {
     const sampleUser = {
       firstname: 'John',
       lastname: 'Doe',
+      username: 'joedan',
       email: 'johndoe@example.com',
       roll: '12345',
       admin: false // Add more fields as needed for the test
@@ -53,6 +54,7 @@ describe('User Model', () => {
       expect(err).to.be.an('Error');
       expect(err.errors).to.exist;
       expect(err.errors.firstname).to.exist;
+      expect(err.errors.username).to.exist;
       expect(err.errors.lastname).to.exist;
       expect(err.errors.email).to.exist;
       expect(err.errors.roll).to.exist;
