@@ -10,6 +10,7 @@ const mongoose = require('mongoose');
 const Issue = require('../models/issues');
 const Book = require('../models/books');
 const User = require('../models/users');
+const Issues = require('../models/issues');
 
 const mongoURI = require('../config/keys').mongoTestURI;
 
@@ -39,16 +40,11 @@ describe('Testing issue routes', () => {
     });
 
     describe('/api/issues', () => {
-        it('GET /issues should fetch all issues', async () => {
-          const response = await request(app)
-            .get('/api/issues')
-            .expect(200);
-    
-        //   expect(response.body).to.be.an('array');
-        });
+        let sampleBook, sampleUser, sampleIssue;
+        let savedBook, savedUser, savedIssue;
 
-        it('POST /issues should create a new issue', async () => {
-            const sampleBook = {
+        beforeEach(async() => {
+            sampleBook = {
                 name: 'Test Book',
                 author: 'Test Author',
                 description: 'Test description',
@@ -62,9 +58,9 @@ describe('Testing issue routes', () => {
               };
 
             const book = new Book(sampleBook);
-            let savedBook = await book.save();
+            savedBook = await book.save();
 
-            const sampleUser = {
+            sampleUser = {
                 firstname: 'John',
                 lastname: 'Doe',
                 email: 'johndoe@example.com',
@@ -73,21 +69,35 @@ describe('Testing issue routes', () => {
             };
 
             const user = new User(sampleUser);
-            let savedUser = await user.save();
+            savedUser = await user.save();
 
-            const issueData = {
+            issueData = {
               userId: savedUser._id,
               bookId: savedBook._id,
               copyNumber: 1,
               dueDate: new Date()
             };
+        })
+
+        it('GET /issues should fetch all issues', async () => {
+            let issue = new Issues(issueData);
+            savedIssue = await issue.save();
+
+          const response = await request(app)
+            .get('/api/issues')
+            .expect(200);
     
+            expect(response.body[0]).to.have.property('_id').equal(savedIssue._id.toString());
+        });
+
+        it('POST /issues should create a new issue', async () => {
             const response = await request(app)
               .post('/api/issues')
               .send(issueData)
               .expect(200);
 
-            // expect(response.body).to.be.an('object');
+            expect(response.body.userId).to.have.property('_id').equal(savedUser._id.toString());
+            expect(response.body.bookId).to.have.property('_id').equal(savedBook._id.toString());
         });
 
         it('PUT /issues should fail', async() => {
@@ -97,18 +107,8 @@ describe('Testing issue routes', () => {
         });
 
         it('DELETE /issues should delete all issues', async() => {
-            const userId = new mongoose.Types.ObjectId().toString();
-            const bookId = new mongoose.Types.ObjectId().toString();
-
-            const sampleIssue = {
-            userId,
-            bookId,
-            copyNumber: 1,
-            dueDate: new Date()
-            };
-
-            const newIssue = new Issue(sampleIssue);
-            await newIssue.save();
+            const issue = new Issue(issueData);
+            await issue.save();
 
             await request(app)
                 .delete('/api/issues')
