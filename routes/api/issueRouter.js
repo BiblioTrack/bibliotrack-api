@@ -35,8 +35,8 @@ issueRouter
     authenticate.verifyAdmin,
     function (req, res, next) {
       Issue.find({})
-        .populate("student")
-        .populate("book")
+        .populate("userId")
+        .populate("bookId")
         .then(
           (issues) => {
             res.statusCode = 200;
@@ -157,8 +157,8 @@ issueRouter
   .get(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
     console.log("\n\n\n Object ID =====" + req.user._id);
     Issue.find({ student: req.user._id })
-      .populate("student")
-      .populate("book")
+      .populate("userId")
+      .populate("bookId")
       .then(
         (issue) => {
           res.statusCode = 200;
@@ -238,8 +238,8 @@ issueRouter
                     },
                     { new: true }
                   )
-                    .populate("student")
-                    .populate("book")
+                    .populate("userId")
+                    .populate("bookId")
                     .then(
                       (issue) => {
                         Books.findByIdAndUpdate(
