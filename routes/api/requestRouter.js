@@ -75,7 +75,7 @@ requestRouter
     authenticate.verifyUser,
     authenticate.verifyAdmin,
     (req, res, next) => {
-      Request.findByIdAndRemove(req.params.requestId)
+      Request.findOneAndDelete({ _id: req.params.requestId })
         .then((resp) => {
           res.statusCode = 200;
           res.setHeader("Content-Type", "application/json");
@@ -83,6 +83,6 @@ requestRouter
         })
         .catch((err) => next(err));
     }
-  );
+);
 
 module.exports = requestRouter;
