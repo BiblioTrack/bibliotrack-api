@@ -9,7 +9,17 @@ const bookSchema = new Schema({
         type: String,
         minlength: 3,
         required: true,
-        unique: true
+        unique: true,
+        // Add a custom error message for uniqueness violation
+        uniqueCaseInsensitive: true,
+        dropDups: true,
+        validate: {
+            validator: async function (value) {
+                const existingBook = await this.constructor.findOne({ name: new RegExp(`^${value}$`, 'i') });
+                return !existingBook;
+            },
+            message: 'The book with this name already exists.'
+        }
     },
     author: {
         type: String,
@@ -22,14 +32,14 @@ const bookSchema = new Schema({
 
     isbn: {
         type: String,
-        minlength: 10,
+        minlength: 6,
         maxlength: 13,
         required: true,
         unique: true
     },
     genres: {
         type: [String],
-        enum: ['Romance','Technology','Computer Science','Management','Electronics','Physics','Chemistry','Mathematics','Fiction','Philosophy','Language','Arts','Other'],
+        enum: ['Romance','Dystopian', 'Technology','Computer Science','Management','Electronics','Physics','Chemistry','Mathematics','Fiction','Philosophy','Language','Arts','Classics', 'Other'],
         required: true
     },
     shelf: {
@@ -63,10 +73,14 @@ const bookSchema = new Schema({
         default: today  // Set default value to today's date
     },
     availableCopies: {
-        type: Number, min: 0
+        type: Number,
+        min: 0,
+        default: 8  // Set the default available copies when adding a new book
     },
     totalCopies: {
-        type: Number, min: 0  // Assuming totalCopies is a number
+        type: Number,
+        min: 0,
+        default: 8  // Set the default total copies when adding a new book
     },
     edition: {
         type: Number, min: 1, max: 1000

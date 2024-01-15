@@ -13,18 +13,29 @@ var User = new Schema({
       },
       username: {
         type: String,
-         required: true,     
+        required: true,
+        unique: true,
+        // Add a custom error message for uniqueness violation
+        uniqueCaseInsensitive: true,
+        dropDups: true,
+        validate: {
+            validator: async function (value) {
+                const existingUser = await this.constructor.findOne({ username: new RegExp(`^${value}$`, 'i') });
+                return !existingUser;
+            },
+            message: 'The username is already taken.'
+        }
       },
       email:{
           type: String,
           required: true,
           unique: true
       },
-      roll:{
+      role: {
         type: String,
-        required: true,
-        unique: true
-      },
+        enum: ['student', 'teacher', 'admin'],
+        required: true
+      },      
     admin:   {
         type: Boolean,
         default: false

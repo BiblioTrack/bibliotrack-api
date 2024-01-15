@@ -1,29 +1,17 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-
 const issueSchema = new Schema({
-    userId: {
+    // Reference to BookRequest
+    request: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+        ref: 'BookRequest',
         required: true
     },
-    bookId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Book',
-        required: true
-    },
-    copyNumber: {
-        type: Number, // Assuming copy number is a numerical value
-        required: true
-    },
+    // Include necessary fields from BookRequest
     issueDate: {
         type: Date,
         default: Date.now
-    },
-    dueDate: {
-        type: Date,
-        required: true
     },
     returnDate: {
         type: Date
@@ -34,7 +22,5 @@ const issueSchema = new Schema({
     }
 });
 
-
-var Issues = mongoose.model('Issue',issueSchema);
-
-module.exports=Issues;
+var Issue = mongoose.model('Issue', issueSchema);
+module.exports = Issue;

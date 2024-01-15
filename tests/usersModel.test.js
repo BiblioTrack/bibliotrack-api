@@ -2,9 +2,9 @@ const mongoose = require('mongoose');
 const chai = require('chai');
 const { expect } = chai;
 
-const User = require('../models/users'); // Update the path to your user model
+const User = require('../models/users');
 
-const mongoURI = require('../config/keys').mongoTestURI; // Replace with your test database URI
+const mongoURI = require('../config/keys').mongoTestURI;
 
 describe('User Model', () => {
   before(async () => {
@@ -28,8 +28,9 @@ describe('User Model', () => {
       lastname: 'Doe',
       username: 'joedan',
       email: 'johndoe@example.com',
-      roll: '12345',
-      admin: false // Add more fields as needed for the test
+      role: 'student', // Assuming 'role' is the correct field name
+      admin: false,
+      // Add more fields as needed for the test
     };
 
     const newUser = new User(sampleUser);
@@ -39,7 +40,7 @@ describe('User Model', () => {
     expect(savedUser.firstname).to.equal('John');
     expect(savedUser.lastname).to.equal('Doe');
     expect(savedUser.email).to.equal('johndoe@example.com');
-    expect(savedUser.roll).to.equal('12345');
+    expect(savedUser.role).to.equal('student');
     expect(savedUser.admin).to.equal(false);
     // Add more assertions for other fields as needed
   });
@@ -54,10 +55,10 @@ describe('User Model', () => {
       expect(err).to.be.an('Error');
       expect(err.errors).to.exist;
       expect(err.errors.firstname).to.exist;
-      expect(err.errors.username).to.exist;
       expect(err.errors.lastname).to.exist;
+      expect(err.errors.username).to.exist;
       expect(err.errors.email).to.exist;
-      expect(err.errors.roll).to.exist;
+      expect(err.errors.role).to.exist;
       // Assert specific errors for missing required fields
     }
   });

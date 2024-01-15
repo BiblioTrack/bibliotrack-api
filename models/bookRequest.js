@@ -2,7 +2,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const requestSchema = new Schema({
+const bookRequestSchema = new Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
@@ -13,23 +13,23 @@ const requestSchema = new Schema({
         ref: 'Book',
         required: true
     },
-    issueDate: {
+    copyNumber: {
+        type: Number,
+        required: true
+    },
+    requestDate: {
         type: Date,
         default: Date.now
     },
     dueDate: {
         type: Date,
         required: true
-    },  
-    status: {
+    },
+    reason: {
         type: String,
-        enum: ['Pending', 'Rejected', 'Approved'],
-        default: 'Pending'
-    }
-}, {
-    timestamps: true
+        required: true
+    },
 });
 
-var Request = mongoose.model('Request', requestSchema);
-
-module.exports = Request;
+var BookRequest = mongoose.model('BookRequest', bookRequestSchema);
+module.exports = BookRequest;
