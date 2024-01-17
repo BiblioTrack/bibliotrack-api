@@ -56,10 +56,6 @@ describe('Testing book routes', () => {
     });
 
     describe('Testing / route', () => {
-        beforeEach(async() => {
-            sandbox.stub(Book, 'create').resolves(sampleBook);
-        });
-
         it('GET / should fetch all books', async () => {
             const savedBook = await newBook.save();
 
@@ -73,6 +69,7 @@ describe('Testing book routes', () => {
         it('POST / should create a new book', (done) => {
               request(app)
                 .post('/api/books')
+                .send(sampleBook)
                 .expect(200)
                 .end((err, response) => {
                     expect(response.body.name).to.equal(newBook.name);
