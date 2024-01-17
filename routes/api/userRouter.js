@@ -111,9 +111,9 @@ router.post('/login', cors(), passport.authenticate('local'), (req, res, next) =
       }
       req.logIn(user, (err) => {
           if (err) {
-              res.statusCode = 401;
-              res.setHeader('Content-Type', 'application/json');
-              res.json({ success: false, status: 'Login Unsuccessful!', err: 'Could not log in user!' });
+            res.statusCode = 401;
+            res.setHeader('Content-Type', 'application/json');
+            res.json({ success: false, status: 'Login Unsuccessful!', err: 'Could not log in user!' });
           }
 
           var token = authenticate.getToken({ _id: req.user._id });
