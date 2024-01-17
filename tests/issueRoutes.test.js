@@ -10,11 +10,14 @@ const mongoose = require('mongoose');
 const Issue = require('../models/issues');
 const Book = require('../models/books');
 const User = require('../models/users');
-const Issues = require('../models/issues');
+const BookRequest = require('../models/bookRequest')
 
 const mongoURI = require('../config/keys').mongoTestURI;
 
 describe('Testing issue routes', () => {
+    let sampleBook, sampleUser, sampleRequest, sampleIssue;
+    let savedBook, savedUser, savedRequest;
+
     before(async () => {
         await mongoose.connect(mongoURI, {
             useNewUrlParser: true,
@@ -22,8 +25,50 @@ describe('Testing issue routes', () => {
         });
     });
 
-    beforeEach(() => {
+    beforeEach(async() => {
         app = require('../index');
+
+        sampleBook = {
+            name: 'Test Book',
+            author: 'Test Author',
+            description: 'Test description',
+            isbn: '1234567890123',
+            cat: 'Fiction',
+            shelf: 5,
+            copies: 1,
+            publishYear: 2023,
+            editor: 'Test Editor',
+            language: 'English',
+          };
+
+        const book = new Book(sampleBook);
+        savedBook = await book.save();
+
+        sampleUser = {
+            firstname: 'John',
+            lastname: 'Doe',
+            username: 'johndoe',
+            email: 'johndoe@example.com',
+            role: 'student',
+        };
+
+        const user = new User(sampleUser);
+        savedUser = await user.save();
+
+        sampleRequest = {
+            userId: savedUser._id,
+            bookId: savedBook._id,
+            copyNumber: 1,
+            dueDate: new Date(),
+            reason: 'Test reason',
+        }
+
+        const bookRequest = new BookRequest(sampleRequest);
+        savedRequest = await bookRequest.save();
+
+        sampleIssue = {
+            request: savedRequest._id,
+        }
     });
 
     after(async () => {
@@ -32,6 +77,7 @@ describe('Testing issue routes', () => {
     });
 
     afterEach(async() => {
+        await BookRequest.deleteMany({});
         await Issue.deleteMany({});
         await User.deleteMany({});
         await Book.deleteMany({});
@@ -40,47 +86,8 @@ describe('Testing issue routes', () => {
     });
 
     describe('/api/issues', () => {
-        let sampleBook, sampleUser, sampleIssue;
-        let savedBook, savedUser, savedIssue;
-
-        beforeEach(async() => {
-            sampleBook = {
-                name: 'Test Book',
-                author: 'Test Author',
-                description: 'Test description',
-                isbn: '1234567890123',
-                cat: 'Fiction',
-                shelf: 5,
-                copies: 1,
-                publishYear: 2023,
-                editor: 'Test Editor',
-                language: 'English',
-              };
-
-            const book = new Book(sampleBook);
-            savedBook = await book.save();
-
-            sampleUser = {
-                firstname: 'John',
-                lastname: 'Doe',
-                email: 'johndoe@example.com',
-                roll: '12345',
-                admin: false,
-            };
-
-            const user = new User(sampleUser);
-            savedUser = await user.save();
-
-            issueData = {
-              userId: savedUser._id,
-              bookId: savedBook._id,
-              copyNumber: 1,
-              dueDate: new Date()
-            };
-        })
-
         it('GET /issues should fetch all issues', async () => {
-            let issue = new Issues(issueData);
+            let issue = new Issue(sampleIssue);
             savedIssue = await issue.save();
 
           const response = await request(app)
@@ -93,21 +100,20 @@ describe('Testing issue routes', () => {
         it('POST /issues should create a new issue', async () => {
             const response = await request(app)
               .post('/api/issues')
-              .send(issueData)
+              .send(sampleIssue)
               .expect(200);
 
-            expect(response.body.userId).to.have.property('_id').equal(savedUser._id.toString());
-            expect(response.body.bookId).to.have.property('_id').equal(savedBook._id.toString());
+            expect(response.body).to.have.property('request').equal(savedRequest._id.toString());
         });
 
         it('PUT /issues should fail', async() => {
-            const response = await request(app)
+            await request(app)
                 .put(`/api/issues`)
                 .expect(403);
         });
 
         it('DELETE /issues should delete all issues', async() => {
-            const issue = new Issue(issueData);
+            const issue = new Issue(sampleIssue);
             await issue.save();
 
             await request(app)
@@ -120,64 +126,25 @@ describe('Testing issue routes', () => {
     });
 
     describe('/api/issues/:issueId', () => {
-        // it('GET /:issueId should fetch a specific issue by ID', async () => {
-        //     const sampleBook = {
-        //         name: 'Test Book',
-        //         author: 'Test Author',
-        //         description: 'Test description',
-        //         isbn: '1234567890123',
-        //         cat: 'Fiction',
-        //         shelf: 5,
-        //         copies: 1,
-        //         publishYear: 2023,
-        //         editor: 'Test Editor',
-        //         language: 'English',
-        //       };
-
-        //     const book = new Book(sampleBook);
-        //     let savedBook = await book.save();
-
-        //     const sampleUser = {
-        //         firstname: 'John',
-        //         lastname: 'Doe',
-        //         email: 'johndoe@example.com',
-        //         roll: '12345',
-        //         admin: false,
-        //     };
-
-        //     const user = new User(sampleUser);
-        //     let savedUser = await user.save();
-
-        //     const sampleIssue = {
-        //         userId: savedUser._id,
-        //         bookId: savedBook._id,
-        //         copyNumber: 1,
-        //         dueDate: new Date()
-        //       };
-
-        //     const newIssue = new Issue(sampleIssue);
-        //     const savedIssue = await newIssue.save();
-
-        //     console.log(auth.getToken(sampleUser));
-
-        //     const response = await request(app)
-        //         .get(`/api/issues/${savedIssue._id}`)
-        //         .set('Authorization', `Bearer ${auth.getToken(sampleUser)}`)
-        //         .expect(200);
-
-        //     expect(response.body).to.have.property('_id').equal(savedIssue._id.toString());
-        // })
-
         it('POST /:issueId should fail', async() => {
+            let issue = new Issue(sampleIssue);
+            savedIssue = await issue.save();
+
             await request(app)
-                .post(`/api/issues/${1}`)
+                .post(`/api/issues/${savedIssue._id}`)
                 .expect(403);
         })
 
         it('DELETE /:issueId should fail', async() => {
+            let issue = new Issue(sampleIssue);
+            savedIssue = await issue.save();
+
             await request(app)
-                .delete(`/api/issues/${1}`)
-                .expect(403);
+                .delete(`/api/issues/${savedIssue._id}`)
+                .expect(200);
+
+            const deletedIssue = await Issue.findById(savedIssue._id);
+            expect(deletedIssue).to.be.null;
         })
     });
 });

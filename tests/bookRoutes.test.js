@@ -60,7 +60,7 @@ describe('Testing book routes', () => {
             sandbox.stub(Book, 'create').resolves(sampleBook);
         });
 
-        it('should fetch all books', async () => {
+        it('GET / should fetch all books', async () => {
             const savedBook1 = await newBook.save();
             let tmpBook = { ...sampleBook, name: 'Test Book 1', isbn: '1234567890124'};
             let newBook1 = new Book(tmpBook);
@@ -119,7 +119,7 @@ describe('Testing book routes', () => {
             savedBook = await newBook.save();
         })
 
-        it('GET /book:Id should fetch a specific book', async() => {
+        it('GET /:bookId should fetch a specific book', async() => {
             const response = await request(app)
                 .get(`/api/books/${savedBook._id}`)
                 .expect(200);
@@ -130,9 +130,14 @@ describe('Testing book routes', () => {
         });
 
         it('POST /:bookId should fail', async() => {
+            await Book.deleteMany({});
+
             const response = await request(app)
                 .post(`/api/books/${savedBook._id}`)
-                .expect(403);
+                .send(sampleBook)
+                .expect(200);
+
+            expect(response.body.name).to.equal(savedBook.name);
         });
 
         it('PUT /:bookId should update a specific book', async() => {

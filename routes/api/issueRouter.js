@@ -26,7 +26,7 @@ issueRouter.route('/')
       .catch((err) => next(err));
   })
   .post(cors(), authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
-    BookRequest.findById(req.body.requestId)
+    BookRequest.findById(req.body.request)
       .then((bookRequest) => {
         if (!bookRequest) {
           const err = new Error("Book request not found");
@@ -54,7 +54,7 @@ issueRouter.route('/')
     res.end('PUT operation not supported on /issues');
   })
   .delete(cors(), authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
-    Issue.remove({})
+    Issue.deleteMany({})
       .then((resp) => {
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
