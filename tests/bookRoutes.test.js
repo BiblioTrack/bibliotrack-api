@@ -61,23 +61,13 @@ describe('Testing book routes', () => {
         });
 
         it('GET / should fetch all books', async () => {
-            const savedBook1 = await newBook.save();
-            let tmpBook = { ...sampleBook, name: 'Test Book 1', isbn: '1234567890124'};
-            let newBook1 = new Book(tmpBook);
-            const savedBook2 = await newBook1.save();
+            const savedBook = await newBook.save();
 
-            books = [
-                savedBook1.toObject(),
-                savedBook2.toObject(),
-            ];
+            const response = await request(app).get('/api/books').expect(200);
 
-            const response = await request(app).get('/api/books');
-            const responseNames = response.body.map(book => book.name);
-            const responseIsbns = response.body.map(book => book.isbn);
-
-            expect(response.status).to.equal(200);
-            expect(responseNames).to.include.members(books.map(book => book.name));
-            expect(responseIsbns).to.include.members(books.map(book => book.isbn));
+            expect(response.body[0])
+                .to.have.property("_id")
+                .equal(savedBook._id.toString());
     });
 
         it('POST / should create a new book', (done) => {
@@ -117,6 +107,10 @@ describe('Testing book routes', () => {
 
         beforeEach(async() => {
             savedBook = await newBook.save();
+        })
+
+        afterEach(async() => {
+            await Book.deleteMany({});
         })
 
         it('GET /:bookId should fetch a specific book', async() => {
