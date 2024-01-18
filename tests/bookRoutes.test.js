@@ -56,6 +56,10 @@ describe('Testing book routes', () => {
     });
 
     describe('Testing / route', () => {
+        beforeEach(async() => {
+            sandbox.stub(Book, 'findOne');
+        });
+
         it('GET / should fetch all books', async () => {
             const savedBook = await newBook.save();
 
