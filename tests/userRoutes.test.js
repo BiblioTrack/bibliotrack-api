@@ -48,51 +48,6 @@ describe("Testing user routes", () => {
     sandbox.restore();
   });
 
-  describe("Testing user DB endpoints", () => {
-    beforeEach(async () => {
-      const user = new User(sampleUser);
-      savedUser = await user.save();
-    });
-
-    it("GET / should return all users", async () => {
-      const response = await request(app).get("/api/users").expect(200);
-
-      expect(response.body[0])
-        .to.have.property("_id")
-        .equal(savedUser._id.toString());
-    });
-
-    it("PUT /userId should update a user by Id", async () => {
-      let updatedData = {
-        firstname: "updated",
-      };
-
-      const response = await request(app)
-        .put(`/api/users/${savedUser._id}`)
-        .send(updatedData)
-        .expect(200);
-
-      expect(response.body)
-        .to.have.property("firstname")
-        .equal(updatedData.firstname);
-    });
-
-    it("PUT /password/userId should update a user password by Id", async () => {
-      let updatedData = {
-        password: "updated",
-      };
-
-      const response = await request(app)
-        .put(`/api/users/password/${savedUser._id}`)
-        .send(updatedData)
-        .expect(200);
-
-      expect(response.body)
-        .to.have.property("message")
-        .equal("password changed successfully");
-    });
-  });
-
   describe("Testing user auth", () => {
     beforeEach(async () => {
       sandbox.stub(User, "findOne").resolves(null);
@@ -139,6 +94,51 @@ describe("Testing user routes", () => {
         .expect(200);
 
       expect(response.body).to.have.property("status").equal("JWT valid!");
+    });
+  });
+
+  describe("Testing user DB endpoints", () => {
+    beforeEach(async () => {
+      const user = new User(sampleUser);
+      savedUser = await user.save();
+    });
+
+    it("GET / should return all users", async () => {
+      const response = await request(app).get("/api/users").expect(200);
+
+      expect(response.body[0])
+        .to.have.property("_id")
+        .equal(savedUser._id.toString());
+    });
+
+    it("PUT /userId should update a user by Id", async () => {
+      let updatedData = {
+        firstname: "updated",
+      };
+
+      const response = await request(app)
+        .put(`/api/users/${savedUser._id}`)
+        .send(updatedData)
+        .expect(200);
+
+      expect(response.body)
+        .to.have.property("firstname")
+        .equal(updatedData.firstname);
+    });
+
+    it("PUT /password/userId should update a user password by Id", async () => {
+      let updatedData = {
+        password: "updated",
+      };
+
+      const response = await request(app)
+        .put(`/api/users/password/${savedUser._id}`)
+        .send(updatedData)
+        .expect(200);
+
+      expect(response.body)
+        .to.have.property("message")
+        .equal("password changed successfully");
     });
   });
 });

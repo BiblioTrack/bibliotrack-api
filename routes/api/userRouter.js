@@ -77,6 +77,7 @@ router.post('/signup', cors(), (req, res, next) => {
       req.body.password,
       (err, user) => {
           if (err) {
+            console.log(err);
               res.statusCode = 500;
               res.setHeader('Content-Type', 'application/json');
               res.json({ err: err });

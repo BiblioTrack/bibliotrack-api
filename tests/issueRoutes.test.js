@@ -34,6 +34,11 @@ describe('Testing issue routes', () => {
         sandbox.stub(Book, 'findOne');
         app = require('../index');
 
+        await BookRequest.deleteMany({});
+        await Issue.deleteMany({});
+        await User.deleteMany({});
+        await Book.deleteMany({});
+
         sampleBook = {
             name: 'Test Book',
             author: 'Test Author',
