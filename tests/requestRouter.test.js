@@ -25,6 +25,7 @@ describe("Testing request routes", () => {
   });
 
   beforeEach(async() => {
+    sandbox.stub(Book, 'findOne');
     app = require("../index");
 
     sampleBook = {
