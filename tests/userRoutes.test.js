@@ -19,6 +19,8 @@ describe("Testing user routes", () => {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
+
+    await User.deleteMany({});
   });
 
   after(async () => {

@@ -65,6 +65,8 @@ describe('Testing book routes', () => {
 
             const response = await request(app).get('/api/books').expect(200);
 
+            console.log(response.body);
+
             expect(response.body[0])
                 .to.have.property("_id")
                 .equal(savedBook._id.toString());

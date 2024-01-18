@@ -22,6 +22,10 @@ describe("Testing request routes", () => {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
+
+    await User.deleteMany({});
+    await Book.deleteMany({});
+    await BookRequest.deleteMany({});
   });
 
   beforeEach(async() => {
