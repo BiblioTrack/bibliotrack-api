@@ -5,7 +5,7 @@ name: Bibliotrack CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "routeTests" ]
   pull_request:
     branches: [ "main" ]
 
