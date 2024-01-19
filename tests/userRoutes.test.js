@@ -24,6 +24,8 @@ describe("Testing user routes", () => {
   });
 
   after(async () => {
+    await User.deleteMany({});
+
     await mongoose.connection.close();
     app.close();
   });
@@ -32,7 +34,7 @@ describe("Testing user routes", () => {
     sampleUser = {
       firstname: "John",
       lastname: "Doe",
-      username: "johndoe",
+      username: "usertestname",
       email: "johndoe@example.com",
       role: "student",
       admin: false,

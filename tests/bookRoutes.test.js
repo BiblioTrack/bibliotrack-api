@@ -13,13 +13,15 @@ const mongoURI = require('../config/keys').mongoTestURI;
 
 describe('Testing book routes', () => {
     let app;
-    let sampleBook, newBook, books;
+    let sampleBook, newBook;
 
     before(async () => {
         await mongoose.connect(mongoURI, {
           useNewUrlParser: true,
           useUnifiedTopology: true
         });
+
+        await Book.deleteMany({});
       });
 
     beforeEach(() => {
@@ -29,7 +31,7 @@ describe('Testing book routes', () => {
         app = require('../index');
 
         sampleBook = {
-            name: 'Test Book',
+            name: 'testbook',
             author: 'Test Author',
             description: 'Test description',
             isbn: '1234567890123',
@@ -45,6 +47,8 @@ describe('Testing book routes', () => {
     });
 
     after(async () => {
+        await Book.deleteMany({});
+
         await mongoose.connection.close();
         app.close()
       });

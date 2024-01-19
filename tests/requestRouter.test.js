@@ -51,7 +51,7 @@ describe("Testing request routes", () => {
     sampleUser = {
         firstname: 'John',
         lastname: 'Doe',
-        username: 'johndoe',
+        username: 'usernametest',
         email: 'johndoe@example.com',
         role: 'student',
     };
