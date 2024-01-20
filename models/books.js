@@ -85,6 +85,17 @@ const bookSchema = new Schema({
     edition: {
         type: Number, min: 1, max: 1000
     },
+    imageUrl: {
+        type: String,
+        validate: {
+            validator: function (value) {
+                // Use a regular expression to check if the value is a valid URL
+                const urlRegex = /^(ftp|http|https):\/\/[^ "]+$/;
+                return urlRegex.test(value);
+            },
+            message: 'Invalid URL format.'
+        }
+    },
     language: {
         type: String, enum: ['English', 'German','Turkish',  'Italian', 'French', 'Arabic', 'Persian', 'Greek', 'Spanish','Polish', 'Other', 'Unknown'],
         required: true
