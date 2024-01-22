@@ -17,14 +17,7 @@ var User = new Schema({
         unique: true,
         // Add a custom error message for uniqueness violation
         uniqueCaseInsensitive: true,
-        dropDups: true,
-        validate: {
-            validator: async function (value) {
-                const existingUser = await this.constructor.findOne({ username: new RegExp(`^${value}$`, 'i') });
-                return !existingUser;
-            },
-            message: 'The username is already taken.'
-        }
+        dropDups: true
       },
       email:{
           type: String,
