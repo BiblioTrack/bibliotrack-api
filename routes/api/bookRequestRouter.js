@@ -26,6 +26,13 @@ bookRequestRouter.route('/')
             .catch((err) => next(err));
     })
     .post(cors(), authenticate.verifyUser, (req, res, next) => {
+        const allowedStatusValues = ['Pending', 'Approved', 'Rejected'];
+        // Validate status value
+        if (!allowedStatusValues.includes(req.body.status)) {
+            const err = new Error(`Invalid status value. Allowed values are ${allowedStatusValues.join(', ')}`);
+            err.status = 400;
+            return next(err);
+        }
         Books.findById(req.body.bookId)
             .then((requiredBook) => {
                 Users.findById(req.user._id)
@@ -45,7 +52,8 @@ bookRequestRouter.route('/')
                                 copyNumber: req.body.copyNumber,
                                 requestDate: req.body.requestDate,
                                 dueDate: req.body.dueDate,
-                                reason: req.body.reason
+                                reason: req.body.reason,
+                                status: req.body.status
                             };
 
                             BookRequest.create(newRequest)
@@ -71,6 +79,7 @@ bookRequestRouter.route('/')
         res.statusCode = 403;
         res.end('PUT operation not supported on /bookRequests');
     })
+
     .delete(cors(), authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
         res.statusCode = 403;
         res.end('DELETE operation not supported on /bookRequests');
@@ -111,23 +120,39 @@ bookRequestRouter.route('/:requestId')
                 res.json(resp);
             })
             .catch((err) => next(err));
-    })    
+    })
     .put(cors(), authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
+        const allowedStatusValues = ['Pending', 'Approved', 'Rejected'];
+        const { status, dueDate, copyNumber, reason } = req.body;
+
+        // Validate status value
+        if (!allowedStatusValues.includes(status)) {
+            const err = new Error(`Invalid status value. Allowed values are ${allowedStatusValues.join(', ')}`);
+            err.status = 400;
+            return next(err);
+        }
+
         BookRequest.findByIdAndUpdate(req.params.requestId, {
             $set: {
-                dueDate: req.body.dueDate,
-                copyNumber: req.body.dueDate,
-                reason: req.body.dueDate
+                status: status,
+                dueDate: dueDate,
+                copyNumber: copyNumber,
+                reason: reason,
             }
         }, { new: true })
             .populate('userId')
             .populate('bookId')
             .then((updatedRequest) => {
-                res.statusCode = 200;
-                res.setHeader('Content-Type', 'application/json');
-                res.json(updatedRequest);
+                if (updatedRequest) {
+                    res.statusCode = 200;
+                    res.setHeader('Content-Type', 'application/json');
+                    res.json(updatedRequest);
+                } else {
+                    const err = new Error("Request not found");
+                    err.status = 404;
+                    return next(err);
+                }
             })
-            .catch((err) => res.status(400).json({ success: false, message: "Request not updated" }));
-    });
-
+            .catch((err) => next(err));
+    })
 module.exports = bookRequestRouter;

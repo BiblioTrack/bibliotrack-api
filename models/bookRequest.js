@@ -29,6 +29,12 @@ const bookRequestSchema = new Schema({
         type: String,
         required: true
     },
+    status: {
+        type: String,
+        enum: ['Pending', 'Approved', 'Rejected'], // Enum values for status
+        default: 'Pending',
+        required: true
+    },
 });
 
 var BookRequest = mongoose.model('BookRequest', bookRequestSchema);
