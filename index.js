@@ -55,14 +55,18 @@ app.use('/api/bookRequests',bookRequestRouter);
 
 // Serve static assets if in production
 if (process.env.NODE_ENV === 'production') {
-  // Set static folder
-  app.use(express.static(path.resolve(__dirname, 'client', 'build')));
+  const staticPath = path.join(__dirname, 'client', 'build');
+  console.log('Static Path:', staticPath);
+  app.use(express.static(staticPath));
 
-  // Serve the index.html file for any other route
   app.get('*', (req, res) => {
-      res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
+      const indexPath = path.join(__dirname, 'client', 'build', 'index.html');
+      console.log('Index Path:', indexPath);
+      res.sendFile(indexPath);
   });
 }
+
+
 
 // Add an error handling middleware
 app.use((err, req, res, next) => {
