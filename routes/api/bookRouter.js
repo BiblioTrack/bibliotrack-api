@@ -89,10 +89,7 @@ bookRouter.route('/:bookId')
         res.setHeader('Content-Type', 'application/json');
         res.json(book);
       })
-      .catch((err) => {
-        console.log('edit book', res);
-        next(err)
-      });
+      .catch((err) => next(err));
   })
   .delete(cors(), authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
     Books.findOneAndDelete({ _id: req.params.bookId })
