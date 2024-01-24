@@ -84,11 +84,15 @@ bookRouter.route('/:bookId')
   .put(cors(), authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
     Books.findByIdAndUpdate(req.params.bookId, { $set: req.body }, { new: true })
       .then((book) => {
+
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
         res.json(book);
       })
-      .catch((err) => next(err));
+      .catch((err) => {
+        console.log('edit book', res);
+        next(err)
+      });
   })
   .delete(cors(), authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
     Books.findOneAndDelete({ _id: req.params.bookId })
@@ -99,5 +103,5 @@ bookRouter.route('/:bookId')
       })
       .catch((err) => next(err));
   });
-  
+
 module.exports = bookRouter;
