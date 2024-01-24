@@ -55,13 +55,14 @@ app.use('/api/bookRequests',bookRequestRouter);
 
 // Serve static assets if in production
 if (process.env.NODE_ENV === 'production') {
-    // Set static folder
-    app.use(express.static('client/build'));
-  
-    app.get('*', (req, res) => {
+  // Set static folder
+  app.use(express.static(path.resolve(__dirname, 'client', 'build')));
+
+  // Serve the index.html file for any other route
+  app.get('*', (req, res) => {
       res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
-    });
-  }
+  });
+}
 
 // Add an error handling middleware
 app.use((err, req, res, next) => {
@@ -73,6 +74,6 @@ const port = process.env.PORT || 8080;
 
 
 var server = app.listen(port, ()=> console.log(`Server started running on port ${port}`));
-console.log(`http://127.0.0.1:${port}`)
+
 
 module.exports = server
