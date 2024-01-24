@@ -85,6 +85,31 @@ bookRequestRouter.route('/')
         res.end('DELETE operation not supported on /bookRequests');
     });
 
+
+bookRequestRouter.route('/user')
+.options(cors(), (req, res) => { res.sendStatus(200); })
+.get(cors(), authenticate.verifyUser, (req, res, next) => {
+    try {
+        // Assuming req.user._id is a valid user ID
+        const userId = new mongoose.Types.ObjectId(req.user._id);
+
+        // Fetch all book requests based on the userId
+        BookRequest.find({ userId: userId })
+            .populate('userId')
+            .populate('bookId')
+            .then((requests) => {
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                res.json(requests);
+            })
+            .catch((err) => next(err));
+    } catch (err) {
+        return next(err);
+    }
+});
+
+
+
 bookRequestRouter.route('/:requestId')
     .options(cors(), (req, res) => { res.sendStatus(200); })
     .get(cors(), authenticate.verifyUser, (req, res, next) => {
@@ -154,5 +179,6 @@ bookRequestRouter.route('/:requestId')
                 }
             })
             .catch((err) => next(err));
-    })
+    });
+
 module.exports = bookRequestRouter;

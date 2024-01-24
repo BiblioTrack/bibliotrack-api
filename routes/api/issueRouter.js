@@ -63,6 +63,85 @@ issueRouter.route('/')
       .catch((err) => next(err));
   });
 
+issueRouter.route('/user')
+.options(cors(), (req, res) => { res.sendStatus(200); })
+.get(cors(), authenticate.verifyUser, (req, res, next) => {
+    try {
+        // Assuming req.user._id is a valid user ID
+        const userId = new mongoose.Types.ObjectId(req.user._id);
+
+        // Find all book requests for the given user
+        BookRequest.find({ userId: userId })
+            .then((bookRequests) => {
+
+                const requestIds = bookRequests.map(request => request._id);
+
+                // Fetch all issues based on the book request IDs
+                Issue.find({ 'request': { $in: requestIds } })
+                    .then((issues) => {
+
+                        res.statusCode = 200;
+                        res.setHeader('Content-Type', 'application/json');
+                        res.json(issues);
+                    })
+                    .catch((err) => {
+                        next(err);
+                    });
+            })
+            .catch((err) => {
+                next(err);
+            });
+    } catch (err) {
+        return next(err);
+    }
+});
+  
+issueRouter.route('/user/:param')
+    .options(cors(), (req, res) => { res.sendStatus(200); })
+    .get(cors(), authenticate.verifyUser, (req, res, next) => {
+        try {
+            let userId;
+            let requestIds;
+
+            // Check if the provided parameter is a valid ObjectId (assuming it could be either userId or requestId)
+            if (mongoose.Types.ObjectId.isValid(req.params.param)) {
+                // If valid, consider it as requestId
+                requestIds = [new mongoose.Types.ObjectId(req.params.param)];
+            } else {
+                // If not valid, consider it as userId
+                userId = new mongoose.Types.ObjectId(req.params.param);
+            }
+
+            // If userId is not set, find it based on the authenticated user
+            if (!userId) {
+                userId = new mongoose.Types.ObjectId(req.user._id);
+            }
+
+            // Fetch all book requests for the given user
+            BookRequest.find({ userId: userId })
+                .then((bookRequests) => {
+                    requestIds = requestIds || bookRequests.map(request => request._id);
+
+                    // Fetch all issues based on the book request IDs
+                    Issue.find({ 'request': { $in: requestIds } })
+                        .then((issues) => {
+                            res.statusCode = 200;
+                            res.setHeader('Content-Type', 'application/json');
+                            res.json(issues);
+                        })
+                        .catch((err) => {
+                            next(err);
+                        });
+                })
+                .catch((err) => {
+                    next(err);
+                });
+        } catch (err) {
+            return next(err);
+        }
+    });
+
+
 issueRouter.route('/:issueId')
   .options(cors(), (req, res) => { res.sendStatus(200); })
   .get(cors(), authenticate.verifyUser, (req, res, next) => {
