@@ -1,6 +1,11 @@
 const chai = require('chai');
 const { expect } = chai;
+// const { sinon } = require('./testSetup.test');
 const jwt = require('jsonwebtoken');
+const sinon = require('sinon');
+
+// Stub the jwt library for token-related tests
+sinon.stub(jwt, 'sign').returns('mocked_token');
 
 const config = require('../config/keys'); 
 const { getToken } = require('../authenticate'); 
@@ -78,3 +83,4 @@ describe('verifyAdmin Function', () => {
     });
 });
 
+sinon.restore();
