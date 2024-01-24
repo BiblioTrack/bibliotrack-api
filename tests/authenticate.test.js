@@ -1,6 +1,5 @@
 const chai = require('chai');
 const { expect } = chai;
-// const { sinon } = require('./testSetup.test');
 const jwt = require('jsonwebtoken');
 const sinon = require('sinon');
 
